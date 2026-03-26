@@ -1,13 +1,13 @@
-import { IBuyer, TPayment } from "../../../types";
+import { IBuyer, PartialBuyer, TPayment } from "../../types";
 
 export class Buyer {
-  protected payment: TPayment | "";
+  protected payment: TPayment;
   protected email: string;
   protected phone: string;
   protected address: string;
 
   constructor() {
-    this.payment = "";
+    this.payment = null;
     this.email = "";
     this.phone = "";
     this.address = "";
@@ -33,7 +33,7 @@ export class Buyer {
 
   getData(): IBuyer {
     return {
-      payment: this.payment as TPayment,
+      payment: this.payment,
       email: this.email,
       phone: this.phone,
       address: this.address,
@@ -41,14 +41,14 @@ export class Buyer {
   }
 
   clear(): void {
-    this.payment = "";
+    this.payment = null;
     this.email = "";
     this.phone = "";
     this.address = "";
   }
 
-  validate(): Partial<Record<keyof IBuyer, string>> {
-    const errors: Partial<Record<keyof IBuyer, string>> = {};
+  validate(): PartialBuyer {
+    const errors: PartialBuyer = {};
 
     if (!this.payment) {
       errors.payment = "Не выбран способ оплаты";

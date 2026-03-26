@@ -1,4 +1,4 @@
-import { IApi, IOrder, IProductsResponse } from "../../../types";
+import { IApi, IOrder, IProductsResponse, IOrderResponse } from "../../types";
 
 export class AppApi {
   private api: IApi;
@@ -11,7 +11,7 @@ export class AppApi {
     return this.api.get("/product/");
   }
 
-  createOrder(order: IOrder): Promise<{ total: number }> {
+  createOrder(order: IOrder): Promise<IOrderResponse> {
     return this.api.post("/order/", order);
   }
 }
