@@ -20,3 +20,10 @@ export const settings = {
 
 };
 
+export const events = {
+	BASKET_OPEN: 'basket:open',
+	PRODUCT_SELECT: 'product:select',
+	BASKET_ADD: 'basket:add',
+	BASKET_REMOVE: 'basket:remove',
+	ORDER_OPEN: 'order:open',
+} as const
