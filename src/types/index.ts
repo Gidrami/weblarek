@@ -47,3 +47,20 @@ export interface ICartRemoveEventData {
   product: IProduct,
   updateCart: boolean
 }
+
+export interface ICartCardState {
+  product: IProduct;
+  index: number;
+}
+
+export interface ICartState {
+  items: IProduct[]
+}
+
+export interface ICatalogState {
+  items: IProduct[]
+}
+
+export interface IBasketViewModel {
+  counter: number
+}

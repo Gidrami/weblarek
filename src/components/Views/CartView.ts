@@ -1,13 +1,9 @@
-import { IProduct } from '../../types'
+import { ICartState, IProduct } from '../../types'
 import { events as appEvents } from '../../utils/constants'
 import { cloneTemplate, ensureElement } from '../../utils/utils'
 import { Component } from '../base/Component'
 import { IEvents } from '../base/Events'
 import { CartCardView } from './CartCardView'
-
-export interface ICartState {
-	items: IProduct[]
-}
 
 export class CartView extends Component<ICartState> {
 	private readonly orderButtonElement: HTMLButtonElement

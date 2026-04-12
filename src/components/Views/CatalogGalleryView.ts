@@ -1,12 +1,8 @@
-import { IProduct } from '../../types'
+import { ICatalogState, IProduct } from '../../types'
 import { ensureElement } from '../../utils/utils'
 import { Component } from '../base/Component'
 import { IEvents } from '../base/Events'
 import { CatalogCardView } from './CatalogCardView'
-
-export interface ICatalogState {
-	items: IProduct[]
-}
 
 export class CatalogGalleryView extends Component<ICatalogState> {
 	constructor(

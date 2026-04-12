@@ -1,11 +1,8 @@
+import { IBasketViewModel } from '../../types'
 import { events as appEvents } from '../../utils/constants'
 import { ensureElement } from '../../utils/utils'
 import { Component } from '../base/Component'
 import { IEvents } from '../base/Events'
-
-export interface IBasketViewModel {
-	counter: number
-}
 
 export class HeaderView extends Component<IBasketViewModel> {
 	protected counterElement: HTMLElement
