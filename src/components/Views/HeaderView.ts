@@ -31,7 +31,7 @@ export class HeaderView extends Component<IBasketViewModel> {
 		)
 
 		this.basketButton.addEventListener('click', () => {
-			this.events.emit(appEvents.BASKET_OPEN, {})
+			this.events.emit(appEvents.CART_OPEN, {})
 		})
 	}
 

@@ -7,11 +7,11 @@ import { IEvents } from '../base/Events'
 export class CardCatalogView extends Component<IProduct> {
 	constructor(
 		private readonly events: IEvents,
-		product: IProduct,
+		product: IProduct
 	) {
 		super(product, cloneTemplate('#card-catalog'))
 		this.container.addEventListener('click', () => {
-			this.events.emit(appEvents.PRODUCT_SELECT, { product: this.state })
+			this.events.emit(appEvents.PRODUCT_SELECT, this.state)
 		})
 	}
 

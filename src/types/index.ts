@@ -42,3 +42,8 @@ export interface IOrderResponse {
   id: string;
   total: number;
 }
+
+export interface ICartRemoveEventData {
+  product: IProduct,
+  updateCart: boolean
+}
