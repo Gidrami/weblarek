@@ -1,7 +1,7 @@
 import { IBuyer, TPayment } from '../../types'
 import { cloneTemplate, ensureElement } from '../../utils/utils'
 
-export class OrderFormView {
+export class OrderSecondStepFormView {
 	readonly container: HTMLElement
 	private readonly form: HTMLFormElement
 	private readonly cardBtn: HTMLButtonElement

@@ -8,13 +8,13 @@ import { Buyer } from "../Models/Buyer";
 import { Cart } from "../Models/Cart";
 import { Products } from "../Models/Product";
 import { CartView } from "../Views/CartView";
-import { CardPreviewView } from "../Views/CardPreviewView";
+import { CatalogCardPreviewView } from "../Views/CatalogCardPreviewView";
 import { CatalogGalleryView } from "../Views/CatalogGalleryView";
-import { ContactsFormView } from "../Views/ContactsFormView";
+import { OrderFirstStepFormView } from "../Views/OrderFirstStepFormView";
 import { HeaderView } from "../Views/HeaderView";
-import { Modal } from "../Views/Modal";
-import { OrderFormView } from "../Views/OrderFormView";
-import { SuccessView } from "../Views/SuccessView";
+import { ModalView } from "../Views/ModalView";
+import { OrderSecondStepFormView } from "../Views/OrderSecondStepFormView";
+import { OrderCreatedView } from "../Views/OrderCreatedView";
 
 export class MainPresenter {
   private readonly events: IEvents;
@@ -25,7 +25,7 @@ export class MainPresenter {
 
   private readonly headerView: HeaderView;
   private readonly catalogGalleryView: CatalogGalleryView;
-  private readonly modal: Modal;
+  private readonly modal: ModalView;
 
   constructor() {
     this.events = new EventEmitter();
@@ -40,7 +40,7 @@ export class MainPresenter {
 
     const modalRoot = ensureElement<HTMLElement>("#modal-container");
     const modalContent = ensureElement(".modal__content", modalRoot);
-    this.modal = new Modal(modalRoot, modalContent);
+    this.modal = new ModalView(modalRoot, modalContent);
 
     this.events.on(
       appEvents.PRODUCT_SELECT,
@@ -79,7 +79,7 @@ export class MainPresenter {
   }
 
   private openProductPreview(product: IProduct): void {
-    const preview = new CardPreviewView(
+    const preview = new CatalogCardPreviewView(
       this.events,
       product,
       this.cart.hasItem(product.id),
@@ -95,7 +95,7 @@ export class MainPresenter {
   }
 
   private showOrderForm(): void {
-    const form = new OrderFormView((data) => {
+    const form = new OrderSecondStepFormView((data) => {
       this.buyer.setData(data);
       this.showContactsForm();
     });
@@ -103,7 +103,7 @@ export class MainPresenter {
   }
 
   private showContactsForm(): void {
-    const form = new ContactsFormView((data) => {
+    const form = new OrderFirstStepFormView((data) => {
       this.buyer.setData(data);
       void this.submitOrder();
     });
@@ -125,7 +125,7 @@ export class MainPresenter {
     };
 
     const response = await this.appApi.createOrder(order);
-    const success = new SuccessView(response.total, () => {
+    const success = new OrderCreatedView(response.total, () => {
       this.modal.close();
       this.cart.clear();
       this.buyer.clear();

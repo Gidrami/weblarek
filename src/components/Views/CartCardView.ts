@@ -4,12 +4,12 @@ import { cloneTemplate, ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
-export interface ICardCartState {
+export interface ICartCardState {
   product: IProduct;
   index: number;
 }
 
-export class CardCartView extends Component<ICardCartState> {
+export class CartCardView extends Component<ICartCardState> {
   constructor(
     private readonly events: IEvents,
     product: IProduct,

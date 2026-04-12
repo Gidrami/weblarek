@@ -1,6 +1,6 @@
 import { ensureElement } from '../../utils/utils'
 
-export class Modal {
+export class ModalView {
 	private readonly closeButton: HTMLButtonElement
 
 	constructor(

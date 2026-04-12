@@ -1,7 +1,7 @@
 import { IBuyer } from '../../types'
 import { cloneTemplate, ensureElement } from '../../utils/utils'
 
-export class ContactsFormView {
+export class OrderFirstStepFormView {
 	readonly container: HTMLElement
 	private readonly form: HTMLFormElement
 	private readonly emailInput: HTMLInputElement

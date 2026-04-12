@@ -8,7 +8,7 @@ import { cloneTemplate, ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
-export class CardPreviewView extends Component<IProduct> {
+export class CatalogCardPreviewView extends Component<IProduct> {
   private readonly basketButton: HTMLButtonElement;
 
   constructor(

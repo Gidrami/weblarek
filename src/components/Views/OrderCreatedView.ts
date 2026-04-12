@@ -1,6 +1,6 @@
 import { cloneTemplate, ensureElement } from '../../utils/utils'
 
-export class SuccessView {
+export class OrderCreatedView {
 	readonly container: HTMLElement
 
 	constructor(total: number, onClose: () => void) {

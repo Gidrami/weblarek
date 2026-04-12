@@ -4,7 +4,7 @@ import { cloneTemplate } from '../../utils/utils'
 import { Component } from '../base/Component'
 import { IEvents } from '../base/Events'
 
-export class CardCatalogView extends Component<IProduct> {
+export class CatalogCardView extends Component<IProduct> {
 	constructor(
 		private readonly events: IEvents,
 		product: IProduct

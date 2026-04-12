@@ -3,7 +3,7 @@ import { events as appEvents } from '../../utils/constants'
 import { cloneTemplate, ensureElement } from '../../utils/utils'
 import { Component } from '../base/Component'
 import { IEvents } from '../base/Events'
-import { CardCartView } from './CardCartView'
+import { CartCardView } from './CartCardView'
 
 export interface ICartState {
 	items: IProduct[]
@@ -35,7 +35,7 @@ export class CartView extends Component<ICartState> {
 		list.replaceChildren()
 
 		this.state.items.forEach((product, i) => {
-			const row = new CardCartView(this.events, product, i + 1).render()
+			const row = new CartCardView(this.events, product, i + 1).render()
 			list.append(row)
 		})
 
