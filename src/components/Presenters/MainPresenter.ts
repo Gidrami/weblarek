@@ -67,6 +67,8 @@ export class MainPresenter {
 
 	private updateHeader(): void {
 		this.headerView.render({ counter: this.cart.getItemCount() })
+		const basket = new BasketView(this.events, this.cart.getItems())
+		this.modal.setContent(basket.render())
 	}
 
 	private openProductPreview(product: IProduct): void {
