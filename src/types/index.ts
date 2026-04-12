@@ -44,8 +44,8 @@ export interface IOrderResponse {
 }
 
 export interface ICartRemoveEventData {
-  product: IProduct,
-  updateCart: boolean
+  product: IProduct;
+  updateCart: boolean;
 }
 
 export interface ICartCardState {
@@ -54,13 +54,13 @@ export interface ICartCardState {
 }
 
 export interface ICartState {
-  items: IProduct[]
+  items: IProduct[];
 }
 
 export interface ICatalogState {
-  items: IProduct[]
+  items: IProduct[];
 }
 
 export interface IBasketViewModel {
-  counter: number
+  counter: number;
 }

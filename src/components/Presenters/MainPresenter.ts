@@ -56,9 +56,9 @@ export class MainPresenter {
     this.cart.removeItem(data.product);
     this.updateHeader(data.updateCart);
 
-		if (!data.updateCart) {
-			this.modal.close()
-		}
+    if (!data.updateCart) {
+      this.modal.close();
+    }
   }
 
   private onCartAdd(product: IProduct) {
