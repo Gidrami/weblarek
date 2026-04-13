@@ -5,37 +5,50 @@ import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
 export class CartCardView extends Component<ICartCardState> {
+  private deleteBtnElement!: HTMLButtonElement;
+  private indexElement!: HTMLElement;
+  private titleElement!: HTMLElement;
+  private priceElement!: HTMLElement;
+
   constructor(
     private readonly events: IEvents,
-    product: IProduct,
-    index: number,
+    container: HTMLElement,
   ) {
-    super({ product, index }, cloneTemplate("#card-basket"));
-    const deleteBtn = ensureElement<HTMLButtonElement>(
+    super(container);
+
+    this.initializeElements();
+    this.addEventListeners();
+  }
+
+  initializeElements() {
+    this.indexElement = ensureElement(".basket__item-index", this.container);
+    this.titleElement = ensureElement(".card__title", this.container);
+    this.priceElement = ensureElement(".card__price", this.container);
+    this.deleteBtnElement = ensureElement<HTMLButtonElement>(
       ".basket__item-delete",
       this.container,
     );
-    deleteBtn.addEventListener("click", (e) => {
+  }
+
+  addEventListeners() {
+    this.deleteBtnElement.addEventListener("click", (e) => {
       e.stopPropagation();
       this.events.emit(appEvents.CART_REMOVE, {
-        product: this.state.product,
+        product: this.product,
         updateCart: true,
       } as ICartRemoveEventData);
     });
   }
 
-  protected setValues(): void {
-    const indexEl = this.container.querySelector(
-      ".basket__item-index",
-    ) as HTMLElement;
-    const title = this.container.querySelector(".card__title") as HTMLElement;
-    const price = this.container.querySelector(".card__price") as HTMLElement;
-
-    indexEl.textContent = String(this.state.index);
-    title.textContent = this.state.product.title;
-    price.textContent =
-      this.state.product.price === null
+  set product(value: IProduct) {
+    this.titleElement.textContent = value.title;
+    this.priceElement.textContent =
+      value.price === null
         ? "Бесценно"
-        : `${this.state.product.price} синапсов`;
+        : `${value.price} синапсов`;
+  }
+
+  set index(value: number) {
+    this.indexElement.textContent = String(value);
   }
 }

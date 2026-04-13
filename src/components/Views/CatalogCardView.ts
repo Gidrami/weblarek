@@ -1,46 +1,51 @@
-import { IProduct } from "../../types";
+import { ICatalogCardView, IProduct } from "../../types";
 import {
   CDN_URL,
   events as appEvents,
   categoryMap,
 } from "../../utils/constants";
-import { cloneTemplate } from "../../utils/utils";
+import { cloneTemplate, ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
-export class CatalogCardView extends Component<IProduct> {
+export class CatalogCardView extends Component<ICatalogCardView> {
+  private cardCategory!: HTMLElement;
+  private cardTitle!: HTMLElement;
+  private cardImage!: HTMLImageElement;
+  private cardPrice!: HTMLElement;
+
   constructor(
     private readonly events: IEvents,
-    product: IProduct,
+    container: HTMLElement,
   ) {
-    super(product, cloneTemplate("#card-catalog"));
-    this.container.addEventListener("click", () => {
-      this.events.emit(appEvents.PRODUCT_SELECT, this.state);
-    });
+    super(container);
+
+    this.initializeElements();
+    this.addEventListeners();
   }
 
-  protected setValues(): void {
-    const cardCategory = this.container.querySelector(
-      ".card__category",
-    ) as HTMLElement;
-    const cardTitle = this.container.querySelector(
-      ".card__title",
-    ) as HTMLElement;
-    const cardImage = this.container.querySelector(
-      ".card__image",
-    ) as HTMLImageElement;
-    const cardPrice = this.container.querySelector(
-      ".card__price",
-    ) as HTMLElement;
-
+  set product(value: IProduct) {
     const categoryClass =
-      categoryMap[this.state.category as keyof typeof categoryMap] ??
+      categoryMap[value.category as keyof typeof categoryMap] ??
       "card__category_other";
-    cardCategory.className = `card__category ${categoryClass}`;
-    cardCategory.textContent = this.state.category;
-    cardTitle.textContent = this.state.title;
-    this.setImage(cardImage, `${CDN_URL}${this.state.image}`, this.state.title);
-    cardPrice.textContent =
-      this.state.price === null ? "Бесценно" : `${this.state.price} синапсов`;
+    this.cardCategory.className = `card__category ${categoryClass}`;
+    this.cardCategory.textContent = value.category;
+    this.cardTitle.textContent = value.title;
+    this.setImage(this.cardImage, `${CDN_URL}${value.image}`, value.title);
+    this.cardPrice.textContent =
+      value.price === null ? "Бесценно" : `${value.price} синапсов`;
+  }
+
+  initializeElements() {
+    this.cardCategory = ensureElement(".card__category", this.container);
+    this.cardTitle = ensureElement(".card__title", this.container);
+    this.cardImage = ensureElement<HTMLImageElement>(".card__image", this.container);
+    this.cardPrice = ensureElement(".card__price", this.container);
+  }
+
+  addEventListeners() {
+    this.container.addEventListener("click", () => {
+      this.events.emit(appEvents.PRODUCT_SELECT, this.product);
+    });
   }
 }

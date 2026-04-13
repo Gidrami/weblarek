@@ -54,13 +54,50 @@ export interface ICartCardState {
 }
 
 export interface ICartState {
-  items: IProduct[];
+  elements: HTMLElement[];
+  price: number;
 }
 
-export interface ICatalogState {
-  items: IProduct[];
+export interface ICatalogViewModel {
+  elements: HTMLElement[];
 }
 
-export interface IBasketViewModel {
+export interface ICartViewModel {
   counter: number;
+}
+
+export interface ICatalogCardPreviewView {
+  product: IProduct;
+  inCart: boolean;
+}
+
+export interface IModalViewModel {
+  element: HTMLElement;
+}
+
+export interface IOrderCreatedViewModel {
+  total: number;
+}
+
+export interface IOrderFirstStepFormViewModel {
+
+}
+
+export interface IOrderSecondStepFormViewModel {
+
+}
+
+export interface IOrderFirstStepFilledEvent extends Pick<IBuyer, 'payment' | 'address'> {
+}
+
+export interface IOrderSecondStepFilledEvent extends Pick<IBuyer, 'email' | 'phone'> {
+}
+
+export interface ICatalogCardPreviewViewModel {
+  product: IProduct,
+  inCart: boolean
+}
+
+export interface ICatalogCardView {
+  product: IProduct
 }

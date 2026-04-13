@@ -1,23 +1,34 @@
-import { IBasketViewModel } from "../../types";
+import { ICartViewModel } from "../../types";
 import { events as appEvents } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
-export class HeaderView extends Component<IBasketViewModel> {
-  protected counterElement: HTMLElement;
-  protected basketButton: HTMLButtonElement;
+export class HeaderView extends Component<ICartViewModel> {
+  protected counterElement!: HTMLElement;
+  protected basketButton!: HTMLButtonElement;
 
   constructor(
-    protected events: IEvents,
+    private readonly events: IEvents,
     container: HTMLElement,
   ) {
-    const state: IBasketViewModel = {
-      counter: 0,
-    };
+    super(container);
 
-    super(state, container);
+    this.initializeElements()
+    this.addEventListeners()
+  }
 
+  set counter(value: number) {
+    this.counterElement.textContent = value.toString();
+  }
+
+  addEventListeners() {
+    this.basketButton.addEventListener("click", () => {
+      this.events.emit(appEvents.CART_OPEN, {});
+    });
+  }
+
+  initializeElements() {
     this.counterElement = ensureElement(
       ".header__basket-counter",
       this.container,
@@ -26,13 +37,5 @@ export class HeaderView extends Component<IBasketViewModel> {
       ".header__basket",
       this.container,
     );
-
-    this.basketButton.addEventListener("click", () => {
-      this.events.emit(appEvents.CART_OPEN, {});
-    });
-  }
-
-  protected setValues(): void {
-    this.counterElement.textContent = this.state.counter.toString();
   }
 }

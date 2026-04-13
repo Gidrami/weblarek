@@ -1,24 +1,20 @@
-import { ICatalogState, IProduct } from "../../types";
+import { ICatalogViewModel, IProduct } from "../../types";
 import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 import { CatalogCardView } from "./CatalogCardView";
 
-export class CatalogGalleryView extends Component<ICatalogState> {
+export class CatalogGalleryView extends Component<ICatalogViewModel> {
+
+
   constructor(
     private readonly events: IEvents,
-    items: IProduct[],
+    container: HTMLElement,
   ) {
-    super({ items }, ensureElement(".gallery"));
+    super(container);
   }
 
-  protected setValues(): void {
-    this.container.replaceChildren();
-
-    const cards: HTMLElement[] = this.state.items.map((product) =>
-      new CatalogCardView(this.events, product).render(),
-    );
-
-    this.container.append(...cards);
+  set elements(value: HTMLElement[]) {
+    this.container.replaceChildren(...value);
   }
 }

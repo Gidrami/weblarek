@@ -1,66 +1,74 @@
-import { IBuyer, TPayment } from "../../types";
+import {
+  IBuyer,
+  IOrder,
+  IOrderFirstStepFilledEvent,
+  IOrderFirstStepFormViewModel,
+  IOrderSecondStepFilledEvent,
+  IOrderSecondStepFormViewModel,
+} from "../../types";
 import { cloneTemplate, ensureElement } from "../../utils/utils";
+import { Component } from "../base/Component";
+import { IEvents } from "../base/Events";
+import { events as appEvents } from "../../utils/constants";
 
-export class OrderSecondStepFormView {
-  readonly container: HTMLElement;
-  private readonly form: HTMLFormElement;
-  private readonly cardBtn: HTMLButtonElement;
-  private readonly cashBtn: HTMLButtonElement;
-  private readonly addressInput: HTMLInputElement;
-  private readonly submitBtn: HTMLButtonElement;
-  private readonly errorsEl: HTMLElement;
-  private payment: TPayment = null;
+export class OrderSecondStepFormView extends Component<IOrderSecondStepFormViewModel> {
+  private formElement!: HTMLFormElement;
+  private emailElement!: HTMLInputElement;
+  private phoneElement!: HTMLInputElement;
+  private submitBtnElement!: HTMLButtonElement;
 
   constructor(
-    private readonly onNext: (
-      data: Pick<IBuyer, "payment" | "address">,
-    ) => void,
+    private readonly events: IEvents,
+    container: HTMLElement,
   ) {
-    this.container = cloneTemplate("#order");
-    this.form = this.container as HTMLFormElement;
-    this.cardBtn = ensureElement<HTMLButtonElement>('[name="card"]', this.form);
-    this.cashBtn = ensureElement<HTMLButtonElement>('[name="cash"]', this.form);
-    this.addressInput = ensureElement<HTMLInputElement>(
-      '[name="address"]',
-      this.form,
-    );
-    this.submitBtn = ensureElement<HTMLButtonElement>(
-      '[type="submit"]',
-      this.form,
-    );
-    this.errorsEl = ensureElement(".form__errors", this.form);
+    super(container);
 
-    this.cardBtn.addEventListener("click", () => this.selectPayment("online"));
-    this.cashBtn.addEventListener("click", () => this.selectPayment("cash"));
-    this.addressInput.addEventListener("input", () => this.syncSubmitState());
+    this.initializeElements();
+    this.addEventListeners();
 
-    this.form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (!this.isValid()) {
-        return;
-      }
-      this.onNext({
-        payment: this.payment,
-        address: this.addressInput.value.trim(),
-      });
-    });
-
-    this.syncSubmitState();
+    this.submitBtnElement.disabled = true;
   }
 
-  private selectPayment(method: "online" | "cash"): void {
-    this.payment = method;
-    this.cardBtn.classList.toggle("button_alt-active", method === "online");
-    this.cashBtn.classList.toggle("button_alt-active", method === "cash");
-    this.syncSubmitState();
+  initializeElements() {
+    this.formElement = this.container as HTMLFormElement;
+    this.emailElement = ensureElement<HTMLInputElement>(
+      '[name="email"]',
+      this.container,
+    );
+    this.phoneElement = ensureElement<HTMLInputElement>(
+      '[name="phone"]',
+      this.container,
+    );
+    this.submitBtnElement = ensureElement<HTMLButtonElement>(
+      '[type="submit"]',
+      this.container,
+    );
+  }
+
+  addEventListeners() {
+    this.emailElement.addEventListener("input", () => this.syncSubmitState());
+    this.phoneElement.addEventListener("input", () => this.syncSubmitState());
+    this.formElement.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = this.emailElement.value;
+      const phone = this.phoneElement.value;
+      this.events.emit(appEvents.ORDER_FIRST_FORM_FILLED, {
+        email,
+        phone,
+      } satisfies IOrderSecondStepFilledEvent);
+    });
   }
 
   private isValid(): boolean {
-    return this.payment !== null && this.addressInput.value.trim().length > 0;
+    return (
+      this.emailElement.value.trim().length > 0 &&
+      this.phoneElement.value.trim().length > 0
+    );
   }
 
   private syncSubmitState(): void {
-    this.submitBtn.disabled = !this.isValid();
-    this.errorsEl.textContent = "";
+    if (!this.isValid) {
+      this.submitBtnElement.disabled = true;
+    }
   }
 }

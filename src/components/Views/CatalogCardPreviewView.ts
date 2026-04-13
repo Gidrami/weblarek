@@ -1,4 +1,4 @@
-import { ICartRemoveEventData, IProduct } from "../../types";
+import { ICartRemoveEventData, ICatalogCardPreviewViewModel, IProduct } from "../../types";
 import {
   CDN_URL,
   events as appEvents,
@@ -8,76 +8,79 @@ import { cloneTemplate, ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
-export class CatalogCardPreviewView extends Component<IProduct> {
-  private readonly basketButton: HTMLButtonElement;
+export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewModel> {
+  private cardCategory!: HTMLElement;
+  private cardTitle!: HTMLElement;
+  private cardText!: HTMLElement;
+  private cardImage!: HTMLImageElement;
+  private cardPrice!: HTMLElement;
+  private basketButton!: HTMLButtonElement;
 
   constructor(
     private readonly events: IEvents,
-    product: IProduct,
-    private readonly inCart: boolean,
+    container: HTMLElement,
   ) {
-    super(product, cloneTemplate("#card-preview"));
+    super(container);
+
+    this.initializeElements();
+    this.addEventListeners();
+  }
+
+  initializeElements() {
+    this.cardCategory = ensureElement(
+      ".card__category",
+      this.container
+    );
+    this.cardTitle = ensureElement(
+      ".card__title",
+      this.container
+    );
+    this.cardText = ensureElement(".card__text", this.container);
+    this.cardImage = ensureElement<HTMLImageElement>(".card__image", this.container);
+    this.cardPrice = ensureElement(".card__price", this.container);
     this.basketButton = ensureElement<HTMLButtonElement>(
       ".card__button",
       this.container,
     );
-    this.basketButton.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (this.state.price === null) {
-        return;
-      }
-
-      if (inCart) {
-        this.events.emit(appEvents.CART_REMOVE, {
-          product: this.state,
-          updateCart: false,
-        } as ICartRemoveEventData);
-      } else {
-        this.events.emit(appEvents.CART_ADD, this.state);
-      }
-    });
   }
 
-  protected setValues(): void {
-    const cardCategory = this.container.querySelector(
-      ".card__category",
-    ) as HTMLElement;
-    const cardTitle = this.container.querySelector(
-      ".card__title",
-    ) as HTMLElement;
-    const cardText = this.container.querySelector(".card__text") as HTMLElement;
-    const cardImage = this.container.querySelector(
-      ".card__image",
-    ) as HTMLImageElement;
-    const cardPrice = this.container.querySelector(
-      ".card__price",
-    ) as HTMLElement;
-
+  set product(value: IProduct) {
+    this.product = value;
     const categoryClass =
-      categoryMap[this.state.category as keyof typeof categoryMap] ??
+      categoryMap[value.category as keyof typeof categoryMap] ??
       "card__category_other";
-    cardCategory.className = `card__category ${categoryClass}`;
-    cardCategory.textContent = this.state.category;
-    cardTitle.textContent = this.state.title;
-    cardText.textContent = this.state.description;
-    this.setImage(cardImage, `${CDN_URL}${this.state.image}`, this.state.title);
+    this.cardCategory.className = `card__category ${categoryClass}`;
+    this.cardCategory.textContent = value.category;
+    this.cardTitle.textContent = value.title;
+    this.cardText.textContent = value.description;
+    this.setImage(this.cardImage, `${CDN_URL}${value.image}`, value.title);
 
-    const withoutPrice = this.state.price === null;
-    cardPrice.textContent = withoutPrice
+    const withoutPrice = value.price === null;
+    this.cardPrice.textContent = withoutPrice
       ? "Бесценно"
-      : `${this.state.price} синапсов`;
+      : `${value.price} синапсов`;
     this.basketButton.disabled = withoutPrice;
 
     if (withoutPrice) {
       this.basketButton.textContent = "Недоступно";
-
-      return;
     }
+  }
 
-    if (this.inCart) {
+  set inCart(value: boolean) {
+    if (value) {
       this.basketButton.textContent = "Удалить из корзины";
     } else {
       this.basketButton.textContent = "В корзину";
     }
+  }
+
+  addEventListeners() {
+    this.basketButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+        this.events.emit(appEvents.CART_REMOVE, {
+          product: this.product,
+          updateCart: false,
+        })
+    });
   }
 }

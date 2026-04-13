@@ -25,5 +25,10 @@ export const events = {
 	PRODUCT_SELECT: 'product:select',
 	CART_ADD: 'cart:add',
 	CART_REMOVE: 'cart:remove',
-	ORDER_OPEN: 'order:open',
+	CART_CLEARED: 'cart:clear',
+	CART_CHANGED: 'cart:changed',
+	ORDER_FIRST_FORM_OPEN: 'order:open',
+  ORDER_FIRST_FORM_FILLED: 'order:first_form_filled',
+  ORDER_CREATE: 'order:second_form_filled',
+	ORDER_CREATED: 'order:open',
 } as const

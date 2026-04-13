@@ -1,9 +1,11 @@
 import { IProduct } from "../../types";
+import { events as appEvents } from "../../utils/constants";
+import { IEvents } from "../base/Events";
 
 export class Cart {
   protected items: IProduct[];
 
-  constructor() {
+  constructor(private readonly events: IEvents) {
     this.items = [];
   }
 
@@ -13,13 +15,16 @@ export class Cart {
 
   addItem(item: IProduct): void {
     this.items.push(item);
+    this.events.emit(appEvents.CART_CHANGED);
   }
 
   removeItem(item: IProduct): void {
     this.items = this.items.filter((cartItem) => cartItem.id !== item.id);
+    this.events.emit(appEvents.CART_CHANGED);
   }
 
   clear(): void {
+    this.events.emit(appEvents.CART_CLEARED);
     this.items = [];
   }
 

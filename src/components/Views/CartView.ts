@@ -1,47 +1,47 @@
-import { ICartState, IProduct } from "../../types";
+import { ICartViewModel, IProduct } from "../../types";
 import { events as appEvents } from "../../utils/constants";
 import { cloneTemplate, ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 import { CartCardView } from "./CartCardView";
 
-export class CartView extends Component<ICartState> {
-  private readonly orderButtonElement: HTMLButtonElement;
+export class CartView extends Component<ICartViewModel> {
+  private priceElement!: HTMLElement;
+  private listElement!: HTMLElement;
+  private orderButtonElement!: HTMLButtonElement;
 
   constructor(
     private readonly events: IEvents,
-    items: IProduct[],
+    container: HTMLElement,
   ) {
-    super({ items }, cloneTemplate("#basket"));
+    super(container);
+
+    this.initializeElements()
+    this.addEventListeners()
+  }
+
+  set elements(values: HTMLElement[]) {
+    this.listElement.replaceChildren(...values);
+    this.orderButtonElement.disabled = values.length === 0;
+  }
+
+  set price(value: number) {
+    this.priceElement.textContent = `${value} синапсов`;
+  }
+
+  initializeElements() {
+    this.priceElement = ensureElement(".basket__price", this.container)
+    this.listElement = ensureElement(".basket__list", this.container);
     this.orderButtonElement = ensureElement<HTMLButtonElement>(
       ".basket__button",
       this.container,
     );
-    this.orderButtonElement.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (this.state.items.length === 0) {
-        return;
-      }
-      this.events.emit(appEvents.ORDER_OPEN, {});
-    });
   }
 
-  protected setValues(): void {
-    const list = ensureElement(".basket__list", this.container);
-    list.replaceChildren();
-
-    this.state.items.forEach((product, i) => {
-      const row = new CartCardView(this.events, product, i + 1).render();
-      list.append(row);
+  addEventListeners() {
+    this.orderButtonElement.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.events.emit(appEvents.ORDER_FIRST_FORM_OPEN, {});
     });
-
-    const total = this.state.items.reduce(
-      (sum, item) => sum + (item.price ?? 0),
-      0,
-    );
-    ensureElement(".basket__price", this.container).textContent =
-      `${total} синапсов`;
-
-    this.orderButtonElement.disabled = this.state.items.length === 0;
   }
 }
