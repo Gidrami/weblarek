@@ -44,7 +44,7 @@ export interface IOrderResponse {
 }
 
 export interface ICartRemoveEventData {
-  product: IProduct;
+  productId: string;
   updateCart: boolean;
 }
 
@@ -79,14 +79,6 @@ export interface IOrderCreatedViewModel {
   total: number;
 }
 
-export interface IOrderFirstStepFormViewModel {
-
-}
-
-export interface IOrderSecondStepFormViewModel {
-
-}
-
 export interface IOrderFirstStepFilledEvent extends Pick<IBuyer, 'payment' | 'address'> {
 }
 
@@ -103,5 +95,9 @@ export interface ICatalogCardView {
 }
 
 export interface ICatalogCardSelectedEvent {
+  productId: string;
+}
+
+export interface ICartAddEventData {
   productId: string;
 }

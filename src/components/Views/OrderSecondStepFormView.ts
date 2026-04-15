@@ -1,15 +1,11 @@
 import {
-  IBuyer,
-  IOrder,
-  IOrderFirstStepFilledEvent,
-  IOrderFirstStepFormViewModel,
   IOrderSecondStepFilledEvent,
   IOrderSecondStepFormViewModel,
-} from "../../types";
-import { cloneTemplate, ensureElement } from "../../utils/utils";
-import { Component } from "../base/Component";
-import { IEvents } from "../base/Events";
-import { events as appEvents } from "../../utils/constants";
+} from "../../types"
+import { events as appEvents } from "../../utils/constants"
+import { ensureElement } from "../../utils/utils"
+import { Component } from "../base/Component"
+import { IEvents } from "../base/Events"
 
 export class OrderSecondStepFormView extends Component<IOrderSecondStepFormViewModel> {
   private formElement!: HTMLFormElement;
@@ -52,7 +48,7 @@ export class OrderSecondStepFormView extends Component<IOrderSecondStepFormViewM
       e.preventDefault();
       const email = this.emailElement.value;
       const phone = this.phoneElement.value;
-      this.events.emit(appEvents.ORDER_FIRST_FORM_FILLED, {
+      this.events.emit(appEvents.ORDER_SECOND_FORM_FILLED, {
         email,
         phone,
       } satisfies IOrderSecondStepFilledEvent);
@@ -67,8 +63,6 @@ export class OrderSecondStepFormView extends Component<IOrderSecondStepFormViewM
   }
 
   private syncSubmitState(): void {
-    if (!this.isValid) {
-      this.submitBtnElement.disabled = true;
-    }
+    this.submitBtnElement.disabled = !this.isValid();
   }
 }

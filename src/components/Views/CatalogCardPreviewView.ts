@@ -1,12 +1,12 @@
-import { ICartRemoveEventData, ICatalogCardPreviewViewModel, IProduct } from "../../types";
+import { ICatalogCardPreviewViewModel, IProduct } from "../../types"
 import {
   CDN_URL,
   events as appEvents,
   categoryMap,
-} from "../../utils/constants";
-import { cloneTemplate, ensureElement } from "../../utils/utils";
-import { Component } from "../base/Component";
-import { IEvents } from "../base/Events";
+} from "../../utils/constants"
+import { ensureElement } from "../../utils/utils"
+import { Component } from "../base/Component"
+import { IEvents } from "../base/Events"
 
 export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewModel> {
   private cardCategory!: HTMLElement;
@@ -15,6 +15,7 @@ export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewMod
   private cardImage!: HTMLImageElement;
   private cardPrice!: HTMLElement;
   private basketButton!: HTMLButtonElement;
+  private currentProductId: string | null = null;
 
   constructor(
     private readonly events: IEvents,
@@ -45,7 +46,7 @@ export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewMod
   }
 
   set product(value: IProduct) {
-    this.product = value;
+    this.currentProductId = value.id;
     const categoryClass =
       categoryMap[value.category as keyof typeof categoryMap] ??
       "card__category_other";
@@ -77,7 +78,10 @@ export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewMod
   addEventListeners() {
     this.basketButton.addEventListener("click", (e) => {
       e.stopPropagation();
-        this.events.emit(appEvents.CART_ADD_OR_REMOVE)
+      if (!this.currentProductId) {
+        return;
+      }
+      this.events.emit(appEvents.CART_ADD_OR_REMOVE);
     });
   }
 }

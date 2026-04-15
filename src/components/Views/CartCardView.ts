@@ -1,14 +1,15 @@
-import { ICartCardState, ICartRemoveEventData, IProduct } from "../../types";
-import { events as appEvents } from "../../utils/constants";
-import { cloneTemplate, ensureElement } from "../../utils/utils";
-import { Component } from "../base/Component";
-import { IEvents } from "../base/Events";
+import { ICartCardState, ICartRemoveEventData, IProduct } from "../../types"
+import { events as appEvents } from "../../utils/constants"
+import { ensureElement } from "../../utils/utils"
+import { Component } from "../base/Component"
+import { IEvents } from "../base/Events"
 
 export class CartCardView extends Component<ICartCardState> {
   private deleteBtnElement!: HTMLButtonElement;
   private indexElement!: HTMLElement;
   private titleElement!: HTMLElement;
   private priceElement!: HTMLElement;
+  private currentProductId: string | null = null;
 
   constructor(
     private readonly events: IEvents,
@@ -33,14 +34,18 @@ export class CartCardView extends Component<ICartCardState> {
   addEventListeners() {
     this.deleteBtnElement.addEventListener("click", (e) => {
       e.stopPropagation();
+      if (!this.currentProductId) {
+        return;
+      }
       this.events.emit(appEvents.CART_REMOVE, {
-        product: this.product,
+        productId: this.currentProductId,
         updateCart: true,
       } as ICartRemoveEventData);
     });
   }
 
   set product(value: IProduct) {
+    this.currentProductId = value.id;
     this.titleElement.textContent = value.title;
     this.priceElement.textContent =
       value.price === null

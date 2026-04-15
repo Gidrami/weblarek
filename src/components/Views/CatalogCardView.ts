@@ -1,19 +1,19 @@
-import { ICatalogCardSelectedEvent, ICatalogCardView, IProduct } from "../../types";
+import { ICatalogCardSelectedEvent, ICatalogCardView, IProduct } from "../../types"
 import {
   CDN_URL,
   events as appEvents,
   categoryMap,
-} from "../../utils/constants";
-import { cloneTemplate, ensureElement } from "../../utils/utils";
-import { Component } from "../base/Component";
-import { IEvents } from "../base/Events";
+} from "../../utils/constants"
+import { ensureElement } from "../../utils/utils"
+import { Component } from "../base/Component"
+import { IEvents } from "../base/Events"
 
 export class CatalogCardView extends Component<ICatalogCardView> {
   private cardCategory!: HTMLElement;
   private cardTitle!: HTMLElement;
   private cardImage!: HTMLImageElement;
   private cardPrice!: HTMLElement;
-  private productId: string;
+  private currentProductId: string | null = null;
 
   constructor(
     private readonly events: IEvents,
@@ -35,7 +35,7 @@ export class CatalogCardView extends Component<ICatalogCardView> {
     this.setImage(this.cardImage, `${CDN_URL}${value.image}`, value.title);
     this.cardPrice.textContent =
       value.price === null ? "Бесценно" : `${value.price} синапсов`;
-    this.productId = value.id;
+    this.currentProductId = value.id;
   }
 
   initializeElements() {
@@ -47,7 +47,10 @@ export class CatalogCardView extends Component<ICatalogCardView> {
 
   addEventListeners() {
     this.container.addEventListener("click", () => {
-      this.events.emit(appEvents.PRODUCT_SELECT, { productId: this.productId } satisfies ICatalogCardSelectedEvent);
+      if (!this.currentProductId) {
+        return;
+      }
+      this.events.emit(appEvents.PRODUCT_SELECT, { productId: this.currentProductId } satisfies ICatalogCardSelectedEvent);
     });
   }
 }

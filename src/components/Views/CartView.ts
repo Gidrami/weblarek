@@ -1,11 +1,10 @@
-import { IHeaderViewModel, IProduct } from "../../types";
+import { ICartViewModel } from "../../types";
 import { events as appEvents } from "../../utils/constants";
-import { cloneTemplate, ensureElement } from "../../utils/utils";
+import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
-import { CartCardView } from "./CartCardView";
 
-export class CartView extends Component<IHeaderViewModel> {
+export class CartView extends Component<ICartViewModel> {
   private priceElement!: HTMLElement;
   private listElement!: HTMLElement;
   private orderButtonElement!: HTMLButtonElement;
@@ -16,8 +15,8 @@ export class CartView extends Component<IHeaderViewModel> {
   ) {
     super(container);
 
-    this.initializeElements()
-    this.addEventListeners()
+    this.initializeElements();
+    this.addEventListeners();
   }
 
   set elements(values: HTMLElement[]) {
@@ -30,7 +29,7 @@ export class CartView extends Component<IHeaderViewModel> {
   }
 
   initializeElements() {
-    this.priceElement = ensureElement(".basket__price", this.container)
+    this.priceElement = ensureElement(".basket__price", this.container);
     this.listElement = ensureElement(".basket__list", this.container);
     this.orderButtonElement = ensureElement<HTMLButtonElement>(
       ".basket__button",

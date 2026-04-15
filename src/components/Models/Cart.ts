@@ -24,8 +24,8 @@ export class Cart {
   }
 
   clear(): void {
-    this.events.emit(appEvents.CART_CLEARED);
     this.items = [];
+    this.events.emit(appEvents.CART_CLEARED);
   }
 
   getTotalPrice(): number {

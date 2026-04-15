@@ -1,13 +1,11 @@
 import {
-  IBuyer,
-  IOrderFirstStepFilledEvent,
-  IOrderSecondStepFormViewModel,
-  TPayment,
+    IOrderFirstStepFilledEvent,
+    TPayment,
 } from "../../types";
-import { cloneTemplate, ensureElement } from "../../utils/utils";
+import { events as appEvents } from "../../utils/constants";
+import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
-import { events as appEvents } from "../../utils/constants";
 
 export class OrderFirstStepFormView extends Component<IOrderFirstStepFilledEvent> {
   private formElement!: HTMLFormElement;
@@ -86,8 +84,6 @@ export class OrderFirstStepFormView extends Component<IOrderFirstStepFilledEvent
   }
 
   private syncSubmitState(): void {
-    if (!this.isValid) {
-      this.submitBtnElement.disabled = true;
-    }
+    this.submitBtnElement.disabled = !this.isValid();
   }
 }
