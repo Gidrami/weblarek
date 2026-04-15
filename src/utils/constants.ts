@@ -23,7 +23,7 @@ export const settings = {
 export const events = {
 	CART_OPEN: 'cart:open',
 	PRODUCT_SELECT: 'product:select',
-	CART_ADD: 'cart:add',
+	CART_ADD_OR_REMOVE: 'cart:add',
 	CART_REMOVE: 'cart:remove',
 	CART_CLEARED: 'cart:clear',
 	CART_CHANGED: 'cart:changed',

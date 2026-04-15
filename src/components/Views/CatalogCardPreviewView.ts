@@ -77,10 +77,7 @@ export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewMod
   addEventListeners() {
     this.basketButton.addEventListener("click", (e) => {
       e.stopPropagation();
-        this.events.emit(appEvents.CART_REMOVE, {
-          product: this.product,
-          updateCart: false,
-        })
+        this.events.emit(appEvents.CART_ADD_OR_REMOVE)
     });
   }
 }

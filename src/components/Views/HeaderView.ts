@@ -1,10 +1,10 @@
-import { ICartViewModel } from "../../types";
+import { IHeaderViewModel } from "../../types";
 import { events as appEvents } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
-export class HeaderView extends Component<ICartViewModel> {
+export class HeaderView extends Component<IHeaderViewModel> {
   protected counterElement!: HTMLElement;
   protected basketButton!: HTMLButtonElement;
 

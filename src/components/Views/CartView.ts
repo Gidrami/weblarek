@@ -1,11 +1,11 @@
-import { ICartViewModel, IProduct } from "../../types";
+import { IHeaderViewModel, IProduct } from "../../types";
 import { events as appEvents } from "../../utils/constants";
 import { cloneTemplate, ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 import { CartCardView } from "./CartCardView";
 
-export class CartView extends Component<ICartViewModel> {
+export class CartView extends Component<IHeaderViewModel> {
   private priceElement!: HTMLElement;
   private listElement!: HTMLElement;
   private orderButtonElement!: HTMLButtonElement;

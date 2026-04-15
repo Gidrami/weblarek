@@ -53,7 +53,7 @@ export interface ICartCardState {
   index: number;
 }
 
-export interface ICartState {
+export interface ICartViewModel {
   elements: HTMLElement[];
   price: number;
 }
@@ -62,7 +62,7 @@ export interface ICatalogViewModel {
   elements: HTMLElement[];
 }
 
-export interface ICartViewModel {
+export interface IHeaderViewModel {
   counter: number;
 }
 
@@ -100,4 +100,8 @@ export interface ICatalogCardPreviewViewModel {
 
 export interface ICatalogCardView {
   product: IProduct
+}
+
+export interface ICatalogCardSelectedEvent {
+  productId: string;
 }

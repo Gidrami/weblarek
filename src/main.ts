@@ -17,10 +17,13 @@ import "./scss/styles.scss";
 import {
   IBuyer,
   ICartRemoveEventData,
+  ICatalogCardPreviewViewModel,
+  ICatalogCardSelectedEvent,
   IOrder,
   IOrderFirstStepFilledEvent,
   IOrderSecondStepFilledEvent,
   IProduct,
+  ICartViewModel,
 } from "./types";
 import { API_URL, events as appEvents } from "./utils/constants";
 import { cloneTemplate, ensureElement } from "./utils/utils";
@@ -41,7 +44,7 @@ products.setItems(productsResponse.items);
 // Events
 events.on(appEvents.PRODUCT_SELECT, onOpenProductPreview);
 events.on(appEvents.CART_OPEN, onOpenCart);
-events.on(appEvents.CART_ADD, onCartAdd);
+events.on(appEvents.CART_ADD_OR_REMOVE, onCartAdd);
 events.on(appEvents.CART_REMOVE, onCartRemove);
 events.on(appEvents.CART_CHANGED, onCartChanged);
 events.on(appEvents.CART_CLEARED, onCartCleared);
@@ -84,9 +87,17 @@ function onCartRemove(data: ICartRemoveEventData) {
   cart.removeItem(data.product);
 }
 
-function onCartAdd(product: IProduct) {
-  if (!cart.hasItem(product.id)) {
-    cart.addItem(product);
+function onCartAdd() {
+  const selectedItem = products.getSelectedItem()
+
+  if (!selectedItem) {
+    return;
+  }
+
+  if (!cart.hasItem(selectedItem.id)) {
+    cart.addItem(selectedItem);
+  } else {
+    cart.removeItem(selectedItem)
   }
 }
 
@@ -102,11 +113,12 @@ function onCartCleared() {
   modalView.close();
 }
 
-function onOpenProductPreview(product: IProduct): void {
+function onOpenProductPreview(data: ICatalogCardSelectedEvent): void {
+  products.setSelectedItem(products.getItemById(data.productId)!)
   const element = cardCardPreviewView.render({
-    product: product,
-    inCart: cart.hasItem(product.id),
-  });
+    product: products.getSelectedItem()!,
+    inCart: cart.hasItem(data.productId),
+  } satisfies ICatalogCardPreviewViewModel);
   modalView.render({ element });
   modalView.open();
 }
@@ -121,7 +133,7 @@ function onOpenCart(): void {
   const element = cartView.render({
     elements: cartElements,
     price: cart.getTotalPrice(),
-  });
+  } satisfies ICartViewModel);
 
   modalView.render({ element });
   modalView.open();
