@@ -88,34 +88,16 @@ function onCartRemove(data: ICartRemoveEventData) {
 	onOpenCart()
 }
 
-function onCartAddOrRemoveSelectedItem(data: ICartAddEventData) {
+function onCartAddOrRemoveSelectedItem() {
   const selectedItem = products.getSelectedItem()!;
 
-	if (!cart.hasItem(data.productId)) {
+	if (!cart.hasItem(selectedItem.id)) {
     cart.addItem(selectedItem);
 	} else {
     cart.removeItem(selectedItem);
   }
 
-	cardCardPreviewView.render({
-		product: selectedItem,
-		inCart: cart.hasItem(selectedItem.id),
-	} satisfies ICatalogCardPreviewViewModel)
-}
-
-function onCartRemoveSelectedItem(data: ICartRemoveEventData) {
-	const selectedItem = products.getSelectedItem()
-
-	if (!selectedItem) {
-		return
-	}
-
-	cart.removeItem(selectedItem)
-
-	cardCardPreviewView.render({
-		product: selectedItem,
-		inCart: cart.hasItem(selectedItem.id),
-	} satisfies ICatalogCardPreviewViewModel)
+	modalView.close();
 }
 
 function onCartChanged() {
