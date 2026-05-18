@@ -1,4 +1,6 @@
 import { IBuyer, PartialBuyer, TPayment } from "../../types";
+import { events as appEvents } from "../../utils/constants";
+import { IEvents } from "../base/Events";
 
 export class Buyer {
   protected payment: TPayment;
@@ -6,7 +8,7 @@ export class Buyer {
   protected phone: string;
   protected address: string;
 
-  constructor() {
+  constructor(protected events: IEvents) {
     this.payment = null;
     this.email = "";
     this.phone = "";
@@ -29,6 +31,8 @@ export class Buyer {
     if (values.address !== undefined) {
       this.address = values.address;
     }
+
+    this.events.emit(appEvents.BUYER_CHANGED);
   }
 
   getData(): IBuyer {
@@ -45,6 +49,8 @@ export class Buyer {
     this.email = "";
     this.phone = "";
     this.address = "";
+    
+    this.events.emit(appEvents.BUYER_CHANGED);
   }
 
   validate(): PartialBuyer {

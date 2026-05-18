@@ -1,57 +1,37 @@
-import { ICartCardState, ICartRemoveEventData, IProduct } from "../../types"
-import { events as appEvents } from "../../utils/constants"
+import { ICartCardState } from "../../types"
 import { ensureElement } from "../../utils/utils"
-import { Component } from "../base/Component"
-import { IEvents } from "../base/Events"
+import { Card } from "./Card"
 
-export class CartCardView extends Component<ICartCardState> {
+
+export class CartCardView extends Card<ICartCardState> {
   private deleteBtnElement!: HTMLButtonElement;
   private indexElement!: HTMLElement;
-  private titleElement!: HTMLElement;
-  private priceElement!: HTMLElement;
-  private currentProductId: string | null = null;
 
   constructor(
-    private readonly events: IEvents,
     container: HTMLElement,
+    actions?: {
+      onClick: () => void;
+    }
   ) {
     super(container);
 
     this.initializeElements();
-    this.addEventListeners();
+
+    this.deleteBtnElement.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      actions?.onClick();
+    });
   }
 
   initializeElements() {
     this.indexElement = ensureElement(".basket__item-index", this.container);
-    this.titleElement = ensureElement(".card__title", this.container);
-    this.priceElement = ensureElement(".card__price", this.container);
     this.deleteBtnElement = ensureElement<HTMLButtonElement>(
       ".basket__item-delete",
       this.container,
     );
   }
 
-  addEventListeners() {
-    this.deleteBtnElement.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (!this.currentProductId) {
-        return;
-      }
-      this.events.emit(appEvents.CART_REMOVE, {
-        productId: this.currentProductId,
-        updateCart: true,
-      } as ICartRemoveEventData);
-    });
-  }
-
-  set product(value: IProduct) {
-    this.currentProductId = value.id;
-    this.titleElement.textContent = value.title;
-    this.priceElement.textContent =
-      value.price === null
-        ? "Бесценно"
-        : `${value.price} синапсов`;
-  }
 
   set index(value: number) {
     this.indexElement.textContent = String(value);

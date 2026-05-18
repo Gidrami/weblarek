@@ -49,7 +49,6 @@ export interface ICartRemoveEventData {
 }
 
 export interface ICartCardState {
-  product: IProduct;
   index: number;
 }
 
@@ -86,12 +85,10 @@ export interface IOrderSecondStepFilledEvent extends Pick<IBuyer, 'email' | 'pho
 }
 
 export interface ICatalogCardPreviewViewModel {
-  product: IProduct,
   inCart: boolean
 }
 
 export interface ICatalogCardView {
-  product: IProduct
 }
 
 export interface ICatalogCardSelectedEvent {
@@ -101,3 +98,5 @@ export interface ICatalogCardSelectedEvent {
 export interface ICartAddEventData {
   productId: string;
 }
+
+export type TCard = Pick<IProduct, 'title' | 'price'>

@@ -13,7 +13,7 @@ export class OrderFirstStepFormView extends Component<IOrderFirstStepFilledEvent
   private cashBtnElement!: HTMLButtonElement;
   private addressElement!: HTMLInputElement;
   private submitBtnElement!: HTMLButtonElement;
-  private payment: TPayment = null;
+  
 
   constructor(
     private readonly events: IEvents,
@@ -24,7 +24,6 @@ export class OrderFirstStepFormView extends Component<IOrderFirstStepFilledEvent
     this.initializeElements();
     this.addEventListeners();
 
-    this.syncSubmitState();
   }
 
   initializeElements() {
@@ -48,42 +47,42 @@ export class OrderFirstStepFormView extends Component<IOrderFirstStepFilledEvent
   }
 
   addEventListeners() {
-    this.cardBtnElement.addEventListener("click", () =>
-      this.selectPayment("online"),
-    );
-    this.cashBtnElement.addEventListener("click", () =>
-      this.selectPayment("cash"),
-    );
-    this.addressElement.addEventListener("input", () => this.syncSubmitState());
-
-    this.formElement.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const address = this.addressElement.value;
-      this.events.emit(appEvents.ORDER_FIRST_FORM_FILLED, {
-        address,
-        payment: this.payment!,
-      } satisfies IOrderFirstStepFilledEvent);
+  this.cardBtnElement.addEventListener("click", () => {
+    this.events.emit(appEvents.ORDER_PAYMENT_CHANGED, {
+      payment: "online",
     });
-  }
+  });
 
-  private selectPayment(method: "online" | "cash"): void {
-    this.payment = method;
-    this.cardBtnElement.classList.toggle(
-      "button_alt-active",
-      method === "online",
-    );
-    this.cashBtnElement.classList.toggle(
-      "button_alt-active",
-      method === "cash",
-    );
-    this.syncSubmitState();
-  }
+  this.cashBtnElement.addEventListener("click", () => {
+    this.events.emit(appEvents.ORDER_PAYMENT_CHANGED, {
+      payment: "cash",
+    });
+  });
 
-  private isValid(): boolean {
-    return this.payment !== null && this.addressElement.value.trim().length > 0;
-  }
+  this.addressElement.addEventListener("input", () => {
+    this.events.emit(appEvents.ORDER_ADDRESS_CHANGED, {
+      address: this.addressElement.value,
+    });
+  });
 
-  private syncSubmitState(): void {
-    this.submitBtnElement.disabled = !this.isValid();
-  }
+  this.formElement.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    this.events.emit(appEvents.ORDER_FIRST_FORM_FILLED);
+  });
 }
+set payment(value: TPayment) {
+  this.cardBtnElement.classList.toggle(
+    "button_alt-active",
+    value === "online"
+  );
+
+  this.cashBtnElement.classList.toggle(
+    "button_alt-active",
+    value === "cash"
+  );
+}
+
+set valid(value: boolean) {
+  this.submitBtnElement.disabled = !value;
+}};

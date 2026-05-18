@@ -22,9 +22,10 @@ export const settings = {
 
 export const events = {
 	CART_OPEN: 'cart:open',
-	PRODUCT_SELECT: 'product:select',
+	PRODUCTS_CHANGED: 'products:changed',
+  PRODUCT_SELECTED: 'products:selected',
+	BUYER_CHANGED: 'buyer:changed',
 	CART_ADD_OR_REMOVE: 'cart:add',
-	CART_REMOVE: 'cart:remove',
 	CART_CLEARED: 'cart:clear',
 	CART_CHANGED: 'cart:changed',
 	ORDER_FIRST_FORM_OPEN: 'order:first_form_open',
@@ -32,4 +33,6 @@ export const events = {
   ORDER_SECOND_FORM_FILLED: 'order:second_form_filled',
 	ORDER_CREATED: 'order:created',
 	ORDER_COMPLETED: 'order:completed',
+	ORDER_PAYMENT_CHANGED: 'order:payment_changed',
+  ORDER_ADDRESS_CHANGED: 'order:address_changed'
 } as const

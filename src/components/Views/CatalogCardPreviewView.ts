@@ -1,30 +1,33 @@
 import { ICatalogCardPreviewViewModel, IProduct } from "../../types"
 import {
   CDN_URL,
-  events as appEvents,
   categoryMap,
 } from "../../utils/constants"
 import { ensureElement } from "../../utils/utils"
-import { Component } from "../base/Component"
-import { IEvents } from "../base/Events"
+import { Card } from "./Card";
 
-export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewModel> {
+export class CatalogCardPreviewView extends Card<ICatalogCardPreviewViewModel> {
   private cardCategory!: HTMLElement;
   private cardTitle!: HTMLElement;
   private cardText!: HTMLElement;
   private cardImage!: HTMLImageElement;
   private cardPrice!: HTMLElement;
   private basketButton!: HTMLButtonElement;
-  private currentProductId: string | null = null;
 
   constructor(
-    private readonly events: IEvents,
     container: HTMLElement,
+    actions?: {
+      onClick: () => void;
+    }
   ) {
     super(container);
 
     this.initializeElements();
-    this.addEventListeners();
+    this.basketButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      actions?.onClick();
+    });
   }
 
   initializeElements() {
@@ -46,7 +49,6 @@ export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewMod
   }
 
   set product(value: IProduct) {
-    this.currentProductId = value.id;
     const categoryClass =
       categoryMap[value.category as keyof typeof categoryMap] ??
       "card__category_other";
@@ -73,15 +75,5 @@ export class CatalogCardPreviewView extends Component<ICatalogCardPreviewViewMod
     } else {
       this.basketButton.textContent = "В корзину";
     }
-  }
-
-  addEventListeners() {
-    this.basketButton.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (!this.currentProductId) {
-        return;
-      }
-      this.events.emit(appEvents.CART_ADD_OR_REMOVE);
-    });
   }
 }
