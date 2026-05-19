@@ -16,6 +16,7 @@ import { OrderFirstStepFormView } from "./components/Views/OrderFirstStepFormVie
 import { OrderSecondStepFormView } from "./components/Views/OrderSecondStepFormView";
 import "./scss/styles.scss";
 import {
+  IBuyer,
   ICartViewModel,
   ICatalogCardPreviewViewModel,
   ICatalogCardSelectedEvent,
@@ -54,35 +55,79 @@ const orderCreatedView = new OrderCreatedView(
   cloneTemplate("#success"),
 );
 
+let cartCardElements: HTMLElement[] = [];
+
 const catalog = new CatalogGalleryView(ensureElement(".gallery"));
 
 // Events
 events.on(appEvents.PRODUCTS_CHANGED, onProductsChanged);
-events.on(appEvents.PRODUCT_SELECTED, onOpenProductPreview);
+events.on(appEvents.PRODUCTS_ITEM_SELECTED, onOpenProductPreview);
+events.on(appEvents.PRODUCTS_SELECTED_ITEM_CLEARED, onSelectedItemCleared);
 events.on(appEvents.CART_OPEN, onOpenCart);
-events.on(appEvents.CART_ADD_OR_REMOVE, () => onCartAddOrRemoveSelectedItem(false));
-events.on(appEvents.CART_CHANGED, onCartChanged);
+events.on(appEvents.CART_ITEM_ADDED, onCartChanged);
+events.on(appEvents.CART_ITEM_REMOVED, onCartItemRemoved);
 events.on(appEvents.CART_CLEARED, onCartCleared);
 events.on(appEvents.ORDER_FIRST_FORM_OPEN, onFirstFormOpen);
-events.on(appEvents.ORDER_FIRST_FORM_FILLED, onOrderFirstFormFilled);
+events.on(appEvents.ORDER_FIRST_FORM_FILLED, onFirstFormFilled);
+events.on(appEvents.BUYER_CHANGE, onBuyerChange);
+events.on(appEvents.BUYER_CHANGED, onBuyerChanged);
 events.on(
   appEvents.ORDER_SECOND_FORM_FILLED,
   async (data: IOrderSecondStepFilledEvent) => await onOrderCreate(data),
 );
 events.on(appEvents.ORDER_COMPLETED, () => modalView.close());
 
+function onSelectedItemCleared() {
+  modalView.close();
+}
+
+function onFirstFormFilled() {
+  const element = secondStepFormView.render();
+
+  modalView.render({ element });
+}
+
+function onBuyerChange(data: Partial<IBuyer>) {
+  buyer.setData(data);
+}
+
+function onBuyerChanged() {
+  const buyerData = buyer.getData();
+  const errors = buyer.validate();
+
+  if (buyerData.address) {
+    firstStepFormView.address = buyerData.address;
+  }
+
+  if (buyerData.payment) {
+    firstStepFormView.payment = buyerData.payment;
+  }
+
+  if (buyerData.email) {
+    secondStepFormView.email = buyerData.email;
+  }
+
+  if (buyerData.phone) {
+    secondStepFormView.phone = buyerData.phone;
+  }
+
+  firstStepFormView.errors = errors;
+  firstStepFormView.valid = !errors.address && !errors.payment;
+
+  secondStepFormView.errors = errors;
+  secondStepFormView.valid = !errors.email && !errors.phone;
+}
+
 function onProductsChanged() {
-  const elements = products
-    .getItems()
-    .map((p) =>
-      new CatalogCardView(cloneTemplate("#card-catalog"), {
-        onClick: () => products.setSelectedItem(p),
-      }).render({ ...p }),
-    );
+  const elements = products.getItems().map((p) =>
+    new CatalogCardView(cloneTemplate("#card-catalog"), {
+      onClick: () => products.setSelectedItem(p),
+    }).render({ ...p }),
+  );
   catalog.render({ elements });
 }
 
-function onCartAddOrRemoveSelectedItem(closeModal: boolean) {
+function addOrRemoveSelectedItem() {
   const selectedItem = products.getSelectedItem()!;
 
   if (!cart.hasItem(selectedItem.id)) {
@@ -91,14 +136,36 @@ function onCartAddOrRemoveSelectedItem(closeModal: boolean) {
     cart.removeItem(selectedItem);
   }
 
-  if (closeModal) {
-    modalView.close();
-  }
+  products.clearSelectedItem();
 }
 
 function onCartChanged() {
   headerView.render({ counter: cart.getItemCount() });
-  modalView.close();
+
+  cartCardElements = cart.getItems().map((p, i) =>
+    new CartCardView(cloneTemplate("#card-basket"), {
+      onClick: () => cart.removeItem(p),
+    }).render({
+      index: i + 1,
+    }),
+  );
+}
+
+function onCartItemRemoved() {
+  cartCardElements = cart.getItems().map((p, i) =>
+    new CartCardView(cloneTemplate("#card-basket"), {
+      onClick: () => cart.removeItem(p),
+    }).render({
+      index: i + 1,
+    }),
+  );
+  const element = cartView.render({
+    elements: cartCardElements,
+    price: cart.getTotalPrice(),
+  } satisfies ICartViewModel);
+
+  headerView.render({ counter: cart.getItemCount() });
+  modalView.render({ element });
 }
 
 function onCartCleared() {
@@ -107,26 +174,21 @@ function onCartCleared() {
   modalView.close();
 }
 
-function onOpenProductPreview(product: IProduct): void {
+function onOpenProductPreview(): void {
   const cardCardPreviewView = new CatalogCardPreviewView(
     cloneTemplate("#card-preview"),
-    { onClick: () => onCartAddOrRemoveSelectedItem(true) },
+    { onClick: () => addOrRemoveSelectedItem() },
   );
 
-  cardCardPreviewView.inCart = cart.hasItem(product.id);
+  cardCardPreviewView.inCart = cart.hasItem(products.getSelectedItem()!.id);
 
   modalView.render({ element: cardCardPreviewView.render() });
   modalView.open();
 }
 
 function onOpenCart(): void {
-  const cartElements = cart.getItems().map((p, i) =>
-    new CartCardView(cloneTemplate("#card-basket")).render({
-      index: i + 1,
-    }),
-  );
   const element = cartView.render({
-    elements: cartElements,
+    elements: cartCardElements,
     price: cart.getTotalPrice(),
   } satisfies ICartViewModel);
 
@@ -140,38 +202,29 @@ function onFirstFormOpen() {
   modalView.render({ element });
 }
 
-function onOrderFirstFormFilled(data: IOrderFirstStepFilledEvent): void {
-  buyer.setData(data);
-
-  const element = secondStepFormView.render();
-
-  modalView.render({ element });
-}
-
-async function onOrderCreate(data: IOrderSecondStepFilledEvent): Promise<void> {
-  buyer.setData(data);
+async function onOrderCreate(): Promise<void> {
   const buyerData = buyer.getData();
-  const errors = buyer.validate();
-  if (Object.keys(errors).length > 0) {
-    console.error("Ошибка валидации:", errors);
-    return;
+
+  try {
+    const order: IOrder = {
+      ...buyerData,
+      total: cart.getTotalPrice(),
+      items: cart.getItems().map((item) => item.id),
+    };
+
+    const response = await appApi.createOrder(order);
+    const modalContent = orderCreatedView.render({
+      total: response.total,
+    });
+    modalView.render({
+      element: modalContent,
+    });
+
+    cart.clear();
+    buyer.clear();
+  } catch (err) {
+    console.error(err);
   }
-
-  const order: IOrder = {
-    ...buyerData,
-    total: cart.getTotalPrice(),
-    items: cart.getItems().map((item) => item.id),
-  };
-
-  const response = await appApi.createOrder(order);
-  cart.clear();
-  const modalContent = orderCreatedView.render({
-    total: response.total,
-  });
-  modalView.render({
-    element: modalContent,
-  });
-  modalView.open();
 }
 
 async function init() {

@@ -28,10 +28,16 @@ export class Products {
   setSelectedItem(item: IProduct): void {
     this.selectedItem = item;
 
-    this.events.emit(appEvents.PRODUCT_SELECTED, item);
+    this.events.emit(appEvents.PRODUCTS_ITEM_SELECTED);
   }
 
   getSelectedItem(): IProduct | null {
     return this.selectedItem;
+  }
+
+  clearSelectedItem() {
+    this.selectedItem = null;
+
+    this.events.emit(appEvents.PRODUCTS_SELECTED_ITEM_CLEARED)
   }
 }

@@ -15,12 +15,12 @@ export class Cart {
 
   addItem(item: IProduct): void {
     this.items.push(item);
-    this.events.emit(appEvents.CART_CHANGED);
+    this.events.emit(appEvents.CART_ITEM_ADDED);
   }
 
   removeItem(item: IProduct): void {
     this.items = this.items.filter((cartItem) => cartItem.id !== item.id);
-    this.events.emit(appEvents.CART_CHANGED);
+    this.events.emit(appEvents.CART_ITEM_REMOVED);
   }
 
   clear(): void {
