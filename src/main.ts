@@ -156,6 +156,7 @@ function onCartChanged() {
       title: p.title,
     }),
   );
+  cartView.price = cart.getTotalPrice()
 }
 
 function onCartItemRemoved() {
