@@ -169,6 +169,7 @@ function onCartItemRemoved() {
       title: p.title,
     }),
   );
+  cartView.price = cart.getTotalPrice()
 
   headerView.render({ counter: cart.getItemCount() });
   modalView.render({ element: cartView.render() });
