@@ -11,10 +11,7 @@ export class CartView extends Component<ICartViewModel> {
 
   constructor(
     private readonly events: IEvents,
-    container: HTMLElement,
-    actions?: {
-      onClick: () => void;
-    }
+    container: HTMLElement
   ) {
     super(container);
 

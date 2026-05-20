@@ -73,7 +73,7 @@ export class OrderFirstStepFormView extends Component<IOrderFirstStepFilledEvent
     this.formElement.addEventListener("submit", (e) => {
       e.preventDefault();
 
-      this.events.emit(appEvents.ORDER_FIRST_FORM_FILLED);
+      this.events.emit(appEvents.ORDER_SECOND_FORM_OPEN);
     });
   }
   set payment(value: TPayment) {

@@ -48,20 +48,31 @@ export class CatalogCardPreviewView extends Card<ICatalogCardPreviewViewModel> {
     );
   }
 
-  set product(value: IProduct) {
+  set title(value: IProduct['title']) {
+    this.cardTitle.textContent = value;
+  }
+
+  set description(value: IProduct['description']) {
+    this.cardText.textContent = value;
+  }
+
+  set image(value: IProduct['image']) {
+    this.setImage(this.cardImage, `${CDN_URL}${value}`);
+  }
+
+  set category(value: IProduct['category']) {
     const categoryClass =
-      categoryMap[value.category as keyof typeof categoryMap] ??
+      categoryMap[value as keyof typeof categoryMap] ??
       "card__category_other";
     this.cardCategory.className = `card__category ${categoryClass}`;
-    this.cardCategory.textContent = value.category;
-    this.cardTitle.textContent = value.title;
-    this.cardText.textContent = value.description;
-    this.setImage(this.cardImage, `${CDN_URL}${value.image}`, value.title);
+    this.cardCategory.textContent = value;
+  }
 
-    const withoutPrice = value.price === null;
+  set price(value: IProduct['price']) {
+    const withoutPrice = value === null;
     this.cardPrice.textContent = withoutPrice
       ? "Бесценно"
-      : `${value.price} синапсов`;
+      : `${value} синапсов`;
     this.basketButton.disabled = withoutPrice;
 
     if (withoutPrice) {

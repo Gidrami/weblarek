@@ -15,16 +15,7 @@ import { OrderCreatedView } from "./components/Views/OrderCreatedView";
 import { OrderFirstStepFormView } from "./components/Views/OrderFirstStepFormView";
 import { OrderSecondStepFormView } from "./components/Views/OrderSecondStepFormView";
 import "./scss/styles.scss";
-import {
-  IBuyer,
-  ICartViewModel,
-  ICatalogCardPreviewViewModel,
-  ICatalogCardSelectedEvent,
-  IOrder,
-  IOrderFirstStepFilledEvent,
-  IOrderSecondStepFilledEvent,
-  IProduct,
-} from "./types";
+import { IBuyer, IOrder } from "./types";
 import { API_URL, events as appEvents } from "./utils/constants";
 import { cloneTemplate, ensureElement } from "./utils/utils";
 
@@ -55,9 +46,12 @@ const orderCreatedView = new OrderCreatedView(
   cloneTemplate("#success"),
 );
 
-let cartCardElements: HTMLElement[] = [];
+const catalogView = new CatalogGalleryView(ensureElement(".gallery"));
 
-const catalog = new CatalogGalleryView(ensureElement(".gallery"));
+const cardCardPreviewView = new CatalogCardPreviewView(
+    cloneTemplate("#card-preview"),
+    { onClick: () => addOrRemoveSelectedItem() },
+  );
 
 // Events
 events.on(appEvents.PRODUCTS_CHANGED, onProductsChanged);
@@ -68,20 +62,31 @@ events.on(appEvents.CART_ITEM_ADDED, onCartChanged);
 events.on(appEvents.CART_ITEM_REMOVED, onCartItemRemoved);
 events.on(appEvents.CART_CLEARED, onCartCleared);
 events.on(appEvents.ORDER_FIRST_FORM_OPEN, onFirstFormOpen);
-events.on(appEvents.ORDER_FIRST_FORM_FILLED, onFirstFormFilled);
+events.on(appEvents.ORDER_SECOND_FORM_OPEN, onSecondFormOpen);
 events.on(appEvents.BUYER_CHANGE, onBuyerChange);
 events.on(appEvents.BUYER_CHANGED, onBuyerChanged);
 events.on(
   appEvents.ORDER_SECOND_FORM_FILLED,
-  async (data: IOrderSecondStepFilledEvent) => await onOrderCreate(data),
+  async () => await onOrderCreate(),
 );
-events.on(appEvents.ORDER_COMPLETED, () => modalView.close());
+events.on(appEvents.ORDER_COMPLETED, onOrderCompleted);
+
+function onOrderCompleted() {
+  cart.clear();
+  buyer.clear();
+  modalView.close();
+}
 
 function onSelectedItemCleared() {
   modalView.close();
 }
 
-function onFirstFormFilled() {
+function onSecondFormOpen() {
+  const buyerData = buyer.getData()
+
+  secondStepFormView.email = buyerData.email
+  secondStepFormView.phone = buyerData.phone
+
   const element = secondStepFormView.render();
 
   modalView.render({ element });
@@ -124,7 +129,7 @@ function onProductsChanged() {
       onClick: () => products.setSelectedItem(p),
     }).render({ ...p }),
   );
-  catalog.render({ elements });
+  catalogView.render({ elements });
 }
 
 function addOrRemoveSelectedItem() {
@@ -142,61 +147,64 @@ function addOrRemoveSelectedItem() {
 function onCartChanged() {
   headerView.render({ counter: cart.getItemCount() });
 
-  cartCardElements = cart.getItems().map((p, i) =>
+  cartView.elements = cart.getItems().map((p, i) =>
     new CartCardView(cloneTemplate("#card-basket"), {
       onClick: () => cart.removeItem(p),
     }).render({
       index: i + 1,
+      price: p.price,
+      title: p.title,
     }),
   );
 }
 
 function onCartItemRemoved() {
-  cartCardElements = cart.getItems().map((p, i) =>
+  cartView.elements = cart.getItems().map((p, i) =>
     new CartCardView(cloneTemplate("#card-basket"), {
       onClick: () => cart.removeItem(p),
     }).render({
       index: i + 1,
+      price: p.price,
+      title: p.title,
     }),
   );
-  const element = cartView.render({
-    elements: cartCardElements,
-    price: cart.getTotalPrice(),
-  } satisfies ICartViewModel);
 
   headerView.render({ counter: cart.getItemCount() });
-  modalView.render({ element });
+  modalView.render({ element: cartView.render() });
 }
 
 function onCartCleared() {
-  buyer.clear();
   headerView.render({ counter: cart.getItemCount() });
+  
+  cartView.elements = [];
+  cartView.price = 0
+
   modalView.close();
 }
 
 function onOpenProductPreview(): void {
-  const cardCardPreviewView = new CatalogCardPreviewView(
-    cloneTemplate("#card-preview"),
-    { onClick: () => addOrRemoveSelectedItem() },
-  );
+  const selectedItem = products.getSelectedItem();
 
-  cardCardPreviewView.inCart = cart.hasItem(products.getSelectedItem()!.id);
-
-  modalView.render({ element: cardCardPreviewView.render() });
+  modalView.render({
+    element: cardCardPreviewView.render({
+      ...selectedItem,
+      inCart: cart.hasItem(selectedItem!.id),
+    }),
+  });
   modalView.open();
 }
 
 function onOpenCart(): void {
-  const element = cartView.render({
-    elements: cartCardElements,
-    price: cart.getTotalPrice(),
-  } satisfies ICartViewModel);
-
-  modalView.render({ element });
+  modalView.render({ element: cartView.render() });
   modalView.open();
 }
 
 function onFirstFormOpen() {
+  const buyerData = buyer.getData()
+
+  firstStepFormView.address = buyerData.address
+  firstStepFormView.payment = buyerData.payment
+
   const element = firstStepFormView.render();
 
   modalView.render({ element });
@@ -219,9 +227,6 @@ async function onOrderCreate(): Promise<void> {
     modalView.render({
       element: modalContent,
     });
-
-    cart.clear();
-    buyer.clear();
   } catch (err) {
     console.error(err);
   }

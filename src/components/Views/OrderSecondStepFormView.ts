@@ -1,6 +1,5 @@
 import {
   IBuyer,
-  IOrderSecondStepFilledEvent,
   IOrderSecondStepFormViewModel,
   PartialBuyer,
 } from "../../types";

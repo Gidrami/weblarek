@@ -78,13 +78,17 @@ export interface IOrderCreatedViewModel {
   total: number;
 }
 
+export interface IOrderSecondStepFormViewModel {
+  
+}
+
 export interface IOrderFirstStepFilledEvent extends Pick<IBuyer, 'payment' | 'address'> {
 }
 
 export interface IOrderSecondStepFilledEvent extends Pick<IBuyer, 'email' | 'phone'> {
 }
 
-export interface ICatalogCardPreviewViewModel {
+export interface ICatalogCardPreviewViewModel extends IProduct {
   inCart: boolean
 }
 
