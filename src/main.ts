@@ -188,8 +188,8 @@ function onOpenProductPreview(): void {
 
   modalView.render({
     element: cardCardPreviewView.render({
-      ...selectedItem,
       inCart: cart.hasItem(selectedItem!.id),
+      ...selectedItem
     }),
   });
   modalView.open();

@@ -35,6 +35,7 @@ export class CartView extends Component<ICartViewModel> {
       ".basket__button",
       this.container,
     );
+    this.orderButtonElement.disabled = true;
   }
 
   addEventListeners() {
